@@ -6,14 +6,6 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [0.1.1] - 2026-07-23
-
-### Changed
-
-- Ported Resource Reload Guard to Minecraft 1.21.1 on NeoForge and Fabric.
-- Updated the target runtime and bytecode level to Java 21.
-- Centralized loader, Minecraft, and Java compatibility values in `gradle.properties`.
-
 ## [0.1.0] - 2026-07-23
 
 ### Added

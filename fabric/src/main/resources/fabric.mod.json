@@ -24,9 +24,9 @@
     "resource_reload_guard.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": "=${minecraft_version}",
-    "java": ">=${target_java_version}",
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
     "fabric-api": "*"
   }
 }

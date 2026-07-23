@@ -11,4 +11,4 @@ rootProject.name = 'resource_reload_guard'
 
 include 'common'
 include 'fabric'
-include 'neoforge'
+include 'forge'

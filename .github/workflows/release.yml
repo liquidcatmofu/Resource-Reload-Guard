@@ -21,10 +21,9 @@ jobs:
       release_version: ${{ steps.version.outputs.release_version }}
       release_type: ${{ steps.version.outputs.release_type }}
       github_prerelease: ${{ steps.version.outputs.github_prerelease }}
-      target_java_version: ${{ steps.version.outputs.target_java_version }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Read and validate versions
         id: version
@@ -33,15 +32,10 @@ jobs:
           set -euo pipefail
           minecraft_version="$(sed -n 's/^minecraft_version *= *//p' gradle.properties | tr -d '\r')"
           mod_version="$(sed -n 's/^mod_version *= *//p' gradle.properties | tr -d '\r')"
-          target_java_version="$(sed -n 's/^target_java_version *= *//p' gradle.properties | tr -d '\r')"
           release_version="${minecraft_version}-${mod_version}"
 
           if [[ ! "$mod_version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
             echo "mod_version must be valid SemVer: $mod_version" >&2
-            exit 1
-          fi
-          if [[ ! "$target_java_version" =~ ^[1-9][0-9]*$ ]]; then
-            echo "target_java_version must be a positive integer: $target_java_version" >&2
             exit 1
           fi
 
@@ -81,16 +75,15 @@ jobs:
           echo "release_version=$release_version" >> "$GITHUB_OUTPUT"
           echo "release_type=$release_type" >> "$GITHUB_OUTPUT"
           echo "github_prerelease=$github_prerelease" >> "$GITHUB_OUTPUT"
-          echo "target_java_version=$target_java_version" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build and test
         run: |
@@ -101,18 +94,17 @@ jobs:
         env:
           MINECRAFT_VERSION: ${{ steps.version.outputs.minecraft_version }}
           MOD_VERSION: ${{ steps.version.outputs.mod_version }}
-          TARGET_JAVA_VERSION: ${{ steps.version.outputs.target_java_version }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p dist
 
           fabric_jar="fabric/build/libs/ResourceReloadGuard-Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
-          neoforge_jar="neoforge/build/libs/ResourceReloadGuard-NeoForge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          forge_jar="forge/build/libs/ResourceReloadGuard-Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
           test -f "$fabric_jar"
-          test -f "$neoforge_jar"
+          test -f "$forge_jar"
           cp "$fabric_jar" dist/
-          cp "$neoforge_jar" dist/
+          cp "$forge_jar" dist/
 
           awk -v version="$MOD_VERSION" '
             index($0, "## [" version "]") == 1 { capture = 1; next }
@@ -125,15 +117,15 @@ jobs:
           fi
 
           unzip -p "dist/ResourceReloadGuard-Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" fabric.mod.json \
-            | jq -e --arg version "$MOD_VERSION" --arg minecraft "=$MINECRAFT_VERSION" --arg java ">=$TARGET_JAVA_VERSION" \
-              '.version == $version and .environment == "client" and .depends.minecraft == $minecraft and .depends.java == $java' > /dev/null
-          unzip -p "dist/ResourceReloadGuard-NeoForge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" META-INF/neoforge.mods.toml \
+            | jq -e --arg version "$MOD_VERSION" --arg minecraft "~$MINECRAFT_VERSION" \
+              '.version == $version and .environment == "client" and .depends.minecraft == $minecraft' > /dev/null
+          unzip -p "dist/ResourceReloadGuard-Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" META-INF/mods.toml \
             | grep -Fq "version = \"$MOD_VERSION\""
 
           sha256sum dist/*.jar
 
       - name: Upload release bundle
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: release-${{ steps.version.outputs.release_version }}
           path: dist/
@@ -174,7 +166,7 @@ jobs:
       contents: write
     steps:
       - name: Download release bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: release-${{ needs.build.outputs.release_version }}
           path: dist
@@ -221,12 +213,12 @@ jobs:
           - loader: fabric
             label: Fabric
             dependencies: fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
-          - loader: neoforge
-            label: NeoForge
+          - loader: forge
+            label: Forge
             dependencies: ''
     steps:
       - name: Download release bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: release-${{ needs.build.outputs.release_version }}
           path: dist
@@ -245,7 +237,7 @@ jobs:
           game-versions: ${{ needs.build.outputs.minecraft_version }}
           game-version-filter: none
           environment: client
-          java: ${{ needs.build.outputs.target_java_version }}
+          java: 17
           dependencies: ${{ matrix.dependencies }}
           retry-attempts: 2
           fail-mode: fail
@@ -263,12 +255,12 @@ jobs:
           - loader: fabric
             label: Fabric
             dependencies: fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
-          - loader: neoforge
-            label: NeoForge
+          - loader: forge
+            label: Forge
             dependencies: ''
     steps:
       - name: Download release bundle
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: release-${{ needs.build.outputs.release_version }}
           path: dist
@@ -287,7 +279,7 @@ jobs:
           game-versions: ${{ needs.build.outputs.minecraft_version }}
           game-version-filter: none
           environment: client
-          java: ${{ needs.build.outputs.target_java_version }}
+          java: 17
           dependencies: ${{ matrix.dependencies }}
           retry-attempts: 2
           fail-mode: fail

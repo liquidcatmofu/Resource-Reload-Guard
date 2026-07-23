@@ -67,7 +67,7 @@ public final class ReloadGuardClient {
 
     public static void toast(String key) {
         Minecraft minecraft = Minecraft.getInstance();
-        SystemToast.add(minecraft.getToasts(), SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+        SystemToast.add(minecraft.getToasts(), SystemToast.SystemToastIds.PERIODIC_NOTIFICATION,
             Component.translatable("resource_reload_guard.toast.title"), Component.translatable(key));
     }
 }

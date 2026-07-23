@@ -18,12 +18,9 @@ subprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
 
-    def loaderLabel = project.name == 'neoforge' ? 'NeoForge' : project.name.capitalize()
-    def targetJavaVersion = JavaVersion.toVersion(rootProject.target_java_version)
-
     base {
         // Public artifacts use ModName-Loader-MinecraftVersion-SemVer.jar.
-        archivesName = "$rootProject.archives_name-$loaderLabel-$rootProject.minecraft_version"
+        archivesName = "$rootProject.archives_name-${project.name.capitalize()}-$rootProject.minecraft_version"
     }
 
     repositories {
@@ -49,12 +46,12 @@ subprojects {
         // If you remove this line, sources will not be generated.
         withSourcesJar()
 
-        sourceCompatibility = targetJavaVersion
-        targetCompatibility = targetJavaVersion
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = rootProject.target_java_version as Integer
+        it.options.release = 17
     }
 
     tasks.withType(Jar).configureEach {
