@@ -81,7 +81,7 @@ config/resource_reload_guard.toml
 
 ## ビルド
 
-JDK 17以上を用意し、リポジトリのルートで実行します。
+JDK 21を用意し、リポジトリのルートで実行します。生成されるMODは引き続きJava 17を対象とします。
 
 ```bash
 ./gradlew clean build

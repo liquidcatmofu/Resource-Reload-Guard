@@ -34,7 +34,7 @@ Resource Reload Guard is a client-only mod.
 - Modrinth server side: `unsupported`
 - CurseForge project environment: client only
 
-The release workflow refuses to publish to Modrinth unless the project-level side settings match the values above. Every Modrinth and CurseForge upload also explicitly declares one loader, one Minecraft version, Java 17, and the required client environment. The Fabric upload declares Fabric API as a required dependency.
+The release workflow refuses to publish to Modrinth unless the project-level side settings match the values above. It runs Gradle on JDK 21, while the compiled mod and published compatibility metadata continue to target Java 17. Every Modrinth and CurseForge upload also explicitly declares one loader, one Minecraft version, Java 17, and the required client environment. The Fabric upload declares Fabric API as a required dependency.
 
 ## Release procedure
 

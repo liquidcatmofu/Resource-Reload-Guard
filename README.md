@@ -81,7 +81,7 @@ Available policy values are `ALLOW`, `CONFIRM`, `BLOCK`, and `RESTART_ONLY`. The
 
 ## Building
 
-Use JDK 17 or newer and run from the repository root:
+Use JDK 21 and run from the repository root. The resulting mod still targets Java 17:
 
 ```bash
 ./gradlew clean build
