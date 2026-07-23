@@ -1,0 +1,257 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*.*.*-*.*.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      minecraft_version: ${{ steps.version.outputs.minecraft_version }}
+      mod_version: ${{ steps.version.outputs.mod_version }}
+      release_version: ${{ steps.version.outputs.release_version }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Read and validate versions
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          minecraft_version="$(sed -n 's/^minecraft_version *= *//p' gradle.properties | tr -d '\r')"
+          mod_version="$(sed -n 's/^mod_version *= *//p' gradle.properties | tr -d '\r')"
+          release_version="${minecraft_version}-${mod_version}"
+
+          if [[ ! "$mod_version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "mod_version must be valid SemVer: $mod_version" >&2
+            exit 1
+          fi
+          if [[ "$GITHUB_REF_NAME" != "$release_version" ]]; then
+            echo "Tag must be $release_version, but was $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          if ! grep -Fq "## [$mod_version]" CHANGELOG.md; then
+            echo "CHANGELOG.md has no entry for $mod_version" >&2
+            exit 1
+          fi
+
+          echo "minecraft_version=$minecraft_version" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
+          echo "release_version=$release_version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build --no-daemon --stacktrace
+
+      - name: Prepare release files
+        env:
+          MINECRAFT_VERSION: ${{ steps.version.outputs.minecraft_version }}
+          MOD_VERSION: ${{ steps.version.outputs.mod_version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          fabric_jar="fabric/build/libs/Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          forge_jar="forge/build/libs/Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          test -f "$fabric_jar"
+          test -f "$forge_jar"
+          cp "$fabric_jar" dist/
+          cp "$forge_jar" dist/
+
+          awk -v version="$MOD_VERSION" '
+            index($0, "## [" version "]") == 1 { capture = 1; next }
+            capture && /^## \[/ { exit }
+            capture { print }
+          ' CHANGELOG.md > dist/release-notes.md
+          if ! grep -q '[^[:space:]]' dist/release-notes.md; then
+            echo "Release notes for $MOD_VERSION are empty" >&2
+            exit 1
+          fi
+
+          unzip -p "dist/Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" fabric.mod.json \
+            | jq -e --arg version "$MOD_VERSION" --arg minecraft "~$MINECRAFT_VERSION" \
+              '.version == $version and .environment == "client" and .depends.minecraft == $minecraft' > /dev/null
+          unzip -p "dist/Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" META-INF/mods.toml \
+            | grep -Fq "version = \"$MOD_VERSION\""
+
+          sha256sum dist/*.jar
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ steps.version.outputs.release_version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  validate-publishing:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Modrinth project environment
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$MODRINTH_PROJECT_ID"
+          test -n "$MODRINTH_TOKEN"
+          test -n "$CURSEFORGE_PROJECT_ID"
+          test -n "$CURSEFORGE_TOKEN"
+
+          project="$(curl --fail --silent --show-error \
+            --header "Authorization: $MODRINTH_TOKEN" \
+            --header "User-Agent: liquidcatmofu/Resource-Reload-Guard (github.com/liquidcatmofu/Resource-Reload-Guard)" \
+            "https://api.modrinth.com/v2/project/$MODRINTH_PROJECT_ID")"
+
+          echo "$project" | jq -e '
+            .project_type == "mod" and
+            .client_side == "required" and
+            .server_side == "unsupported"
+          ' > /dev/null || {
+            echo "Modrinth project must be a mod with client_side=required and server_side=unsupported." >&2
+            exit 1
+          }
+
+  github-release:
+    needs:
+      - build
+      - validate-publishing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_VERSION" dist/*.jar --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$RELEASE_VERSION" \
+              --title "$RELEASE_VERSION" \
+              --notes-file dist/release-notes.md \
+              --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_VERSION" dist/*.jar \
+              --verify-tag \
+              --title "$RELEASE_VERSION" \
+              --notes-file dist/release-notes.md \
+              --repo "$GITHUB_REPOSITORY"
+          fi
+
+  modrinth:
+    needs:
+      - build
+      - validate-publishing
+      - github-release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - loader: fabric
+            label: Fabric
+            dependencies: fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
+          - loader: forge
+            label: Forge
+            dependencies: ''
+    steps:
+      - name: Download release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Publish ${{ matrix.label }} to Modrinth
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: dist/${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version-type: release
+          changelog-file: dist/release-notes.md
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          game-version-filter: none
+          environment: client
+          java: 17
+          dependencies: ${{ matrix.dependencies }}
+          retry-attempts: 2
+          fail-mode: fail
+
+  curseforge:
+    needs:
+      - build
+      - validate-publishing
+      - github-release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - loader: fabric
+            label: Fabric
+            dependencies: fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
+          - loader: forge
+            label: Forge
+            dependencies: ''
+    steps:
+      - name: Download release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: release-${{ needs.build.outputs.release_version }}
+          path: dist
+
+      - name: Publish ${{ matrix.label }} to CurseForge
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: dist/${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
+          version-type: release
+          changelog-file: dist/release-notes.md
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          game-version-filter: none
+          environment: client
+          java: 17
+          dependencies: ${{ matrix.dependencies }}
+          retry-attempts: 2
+          fail-mode: fail
