@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Resource-Reload-Guard-icon.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:export-filename="Resource-Reload-Guard-icon.png"
+   inkscape:export-xdpi="65.023956"
+   inkscape:export-ydpi="65.023956"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="188.44396"
+     inkscape:cy="200.9951"
+     inkscape:window-width="2560"
+     inkscape:window-height="1511"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="ArrowWide"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="0.80000001"
+       markerHeight="0.80000001"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path1" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path6"
+       style="fill:#009dc4;fill-opacity:1;stroke-width:0.384701;stroke-dasharray:none;paint-order:stroke fill markers"
+       d="M 50.142445,12.663019 C 23.087409,13.955458 5.424013,25.673296 5.424013,25.673296 c 0,0 -0.6896765,26.710535 11.028428,42.650602 11.717809,15.939665 33.688888,24.642032 33.690004,24.642474 0.0011,-4.42e-4 21.97172,-8.702809 33.689529,-24.642474 11.718111,-15.940067 11.028425,-42.650602 11.028425,-42.650602 0,0 -17.662918,-11.717838 -44.717954,-13.010277 z" />
+    <path
+       style="fill:none;stroke:#c5c9f9;stroke-width:4.20414;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWide);paint-order:stroke fill markers"
+       id="path8"
+       sodipodi:type="arc"
+       sodipodi:cx="49.438427"
+       sodipodi:cy="53.107597"
+       sodipodi:rx="22.00996"
+       sodipodi:ry="22.00996"
+       sodipodi:start="0.52359878"
+       sodipodi:end="5.9341195"
+       sodipodi:arc-type="arc"
+       d="M 68.499612,64.112578 A 22.00996,22.00996 0 0 1 42.819904,74.098869 22.00996,22.00996 0 0 1 27.512221,51.189302 22.00996,22.00996 0 0 1 46.565551,31.285935 22.00996,22.00996 0 0 1 70.121024,45.579749"
+       sodipodi:open="true" />
+  </g>
+</svg>
