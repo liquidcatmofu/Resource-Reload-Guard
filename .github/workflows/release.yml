@@ -19,6 +19,8 @@ jobs:
       minecraft_version: ${{ steps.version.outputs.minecraft_version }}
       mod_version: ${{ steps.version.outputs.mod_version }}
       release_version: ${{ steps.version.outputs.release_version }}
+      release_type: ${{ steps.version.outputs.release_type }}
+      github_prerelease: ${{ steps.version.outputs.github_prerelease }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -36,6 +38,29 @@ jobs:
             echo "mod_version must be valid SemVer: $mod_version" >&2
             exit 1
           fi
+
+          version_without_build="${mod_version%%+*}"
+          if [[ "$version_without_build" == *-* ]]; then
+            prerelease="${version_without_build#*-}"
+            case "$prerelease" in
+              alpha|alpha.*)
+                release_type="alpha"
+                ;;
+              beta|beta.*|rc|rc.*)
+                release_type="beta"
+                ;;
+              *)
+                echo "Unsupported SemVer prerelease channel: $prerelease" >&2
+                echo "Use alpha, beta, or rc; stable versions must not have a prerelease suffix." >&2
+                exit 1
+                ;;
+            esac
+            github_prerelease="true"
+          else
+            release_type="release"
+            github_prerelease="false"
+          fi
+
           if [[ "$GITHUB_REF_NAME" != "$release_version" ]]; then
             echo "Tag must be $release_version, but was $GITHUB_REF_NAME" >&2
             exit 1
@@ -48,6 +73,8 @@ jobs:
           echo "minecraft_version=$minecraft_version" >> "$GITHUB_OUTPUT"
           echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
           echo "release_version=$release_version" >> "$GITHUB_OUTPUT"
+          echo "release_type=$release_type" >> "$GITHUB_OUTPUT"
+          echo "github_prerelease=$github_prerelease" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -148,20 +175,28 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+          GITHUB_PRERELEASE: ${{ needs.build.outputs.github_prerelease }}
         shell: bash
         run: |
           set -euo pipefail
+          release_flags=(--prerelease="$GITHUB_PRERELEASE")
+          if [[ "$GITHUB_PRERELEASE" == "true" ]]; then
+            release_flags+=(--latest=false)
+          fi
+
           if gh release view "$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$RELEASE_VERSION" dist/*.jar --clobber --repo "$GITHUB_REPOSITORY"
             gh release edit "$RELEASE_VERSION" \
               --title "$RELEASE_VERSION" \
               --notes-file dist/release-notes.md \
+              "${release_flags[@]}" \
               --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$RELEASE_VERSION" dist/*.jar \
               --verify-tag \
               --title "$RELEASE_VERSION" \
               --notes-file dist/release-notes.md \
+              "${release_flags[@]}" \
               --repo "$GITHUB_REPOSITORY"
           fi
 
@@ -196,7 +231,7 @@ jobs:
           files: dist/ResourceReloadGuard-${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
           name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
-          version-type: release
+          version-type: ${{ needs.build.outputs.release_type }}
           changelog-file: dist/release-notes.md
           loaders: ${{ matrix.loader }}
           game-versions: ${{ needs.build.outputs.minecraft_version }}
@@ -238,7 +273,7 @@ jobs:
           files: dist/ResourceReloadGuard-${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
           name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
-          version-type: release
+          version-type: ${{ needs.build.outputs.release_type }}
           changelog-file: dist/release-notes.md
           loaders: ${{ matrix.loader }}
           game-versions: ${{ needs.build.outputs.minecraft_version }}
