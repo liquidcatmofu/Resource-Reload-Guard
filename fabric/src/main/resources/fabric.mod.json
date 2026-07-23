@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "resource_reload_guard",
+  "version": "${version}",
+  "name": "Resource Reload Guard",
+  "description": "Guards expensive client resource reloads triggered by user actions.",
+  "authors": [
+    "LiquidCatMofu"
+  ],
+  "contact": {
+    "homepage": "https://github.com/liquidcatmofu/Resource-Reload-Guard",
+    "sources": "https://github.com/liquidcatmofu/Resource-Reload-Guard",
+    "issues": "https://github.com/liquidcatmofu/Resource-Reload-Guard/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/resource_reload_guard/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.liquidcatmofu.resourcereloadguard.fabric.ResourceReloadGuardFabricClient"
+    ]
+  },
+  "mixins": [
+    "resource_reload_guard.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}

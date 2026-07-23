@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "package": "dev.liquidcatmofu.resourcereloadguard.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+    "KeyboardHandlerMixin",
+    "MinecraftMixin",
+    "OptionsMixin",
+    "PackSelectionScreenMixin",
+    "LanguageSelectScreenMixin",
+    "LanguageEntryMixin",
+    "accessor.PackSelectionScreenAccessor",
+    "accessor.PackSelectionModelAccessor",
+    "accessor.OptionsSubScreenAccessor",
+    "accessor.LanguageSelectScreenAccessor",
+    "accessor.VideoSettingsScreenAccessor"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
