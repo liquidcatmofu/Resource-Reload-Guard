@@ -15,8 +15,8 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.screens.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
 import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class LanguageSelectScreenMixin {
     @Unique private String resourceReloadGuard$pendingCode;
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "addContents", at = @At("TAIL"))
     private void resourceReloadGuard$restoreSelection(CallbackInfo ci) {
         if (resourceReloadGuard$pendingCode == null) return;
         ObjectSelectionList list = resourceReloadGuard$list();

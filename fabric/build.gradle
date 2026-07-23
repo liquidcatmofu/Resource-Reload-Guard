@@ -42,10 +42,16 @@ dependencies {
 }
 
 processResources {
-    inputs.property 'version', project.version
+    def replaceProperties = [
+        version: project.version,
+        fabric_loader_version: rootProject.fabric_loader_version,
+        minecraft_version: rootProject.minecraft_version,
+        target_java_version: rootProject.target_java_version
+    ]
+    inputs.properties replaceProperties
 
     filesMatching('fabric.mod.json') {
-        expand version: inputs.properties.version
+        expand replaceProperties
     }
 }
 

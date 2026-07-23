@@ -63,7 +63,7 @@ public final class ReloadGuardScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(graphics);
+        renderBackground(graphics, mouseX, mouseY, partialTick);
         graphics.drawCenteredString(font, title, width / 2, 24, 0xFFFFFF);
         int y = 48;
         for (Component line : lines) {
