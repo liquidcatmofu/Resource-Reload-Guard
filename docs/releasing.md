@@ -20,7 +20,7 @@ Add these GitHub Actions repository variables:
 
 Add these GitHub Actions repository secrets:
 
-- `MODRINTH_TOKEN`
+- `MODRINTH_TOKEN` (a Modrinth personal access token with `VERSION_CREATE`)
 - `CURSEFORGE_TOKEN`
 
 The built-in `GITHUB_TOKEN` publishes the GitHub Release and needs no additional secret.
@@ -30,11 +30,10 @@ The built-in `GITHUB_TOKEN` publishes the GitHub Release and needs no additional
 Resource Reload Guard is a client-only mod.
 
 - Modrinth project type: `mod`
-- Modrinth client side: `required`
-- Modrinth server side: `unsupported`
-- CurseForge project environment: client only
+- Modrinth version environment: client only
+- CurseForge file environment: client only
 
-The release workflow refuses to publish to Modrinth unless the project-level side settings match the values above. It runs Gradle on JDK 21, while the compiled mod and published compatibility metadata continue to target Java 17. Every Modrinth and CurseForge upload also explicitly declares one loader, one Minecraft version, Java 17, and the required client environment. The Fabric upload declares Fabric API as a required dependency.
+Modrinth environment metadata belongs to each uploaded version rather than the project as a whole. The release workflow runs Gradle on JDK 21, while the compiled mod and published compatibility metadata continue to target Java 17. Every Modrinth and CurseForge upload explicitly declares one loader, one Minecraft version, Java 17, and the client-only environment. The Fabric upload declares Fabric API as a required dependency.
 
 ## Release procedure
 

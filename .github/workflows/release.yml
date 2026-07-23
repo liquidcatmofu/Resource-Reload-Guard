@@ -109,7 +109,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Verify Modrinth project environment
+      - name: Verify publishing configuration
         env:
           MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
@@ -118,24 +118,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$MODRINTH_PROJECT_ID"
-          test -n "$MODRINTH_TOKEN"
-          test -n "$CURSEFORGE_PROJECT_ID"
-          test -n "$CURSEFORGE_TOKEN"
-
-          project="$(curl --fail --silent --show-error \
-            --header "Authorization: $MODRINTH_TOKEN" \
-            --header "User-Agent: liquidcatmofu/Resource-Reload-Guard (github.com/liquidcatmofu/Resource-Reload-Guard)" \
-            "https://api.modrinth.com/v2/project/$MODRINTH_PROJECT_ID")"
-
-          echo "$project" | jq -e '
-            .project_type == "mod" and
-            .client_side == "required" and
-            .server_side == "unsupported"
-          ' > /dev/null || {
-            echo "Modrinth project must be a mod with client_side=required and server_side=unsupported." >&2
-            exit 1
-          }
+          for name in \
+            MODRINTH_PROJECT_ID \
+            MODRINTH_TOKEN \
+            CURSEFORGE_PROJECT_ID \
+            CURSEFORGE_TOKEN
+          do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::$name is not configured."
+              exit 1
+            fi
+          done
 
   github-release:
     needs:
