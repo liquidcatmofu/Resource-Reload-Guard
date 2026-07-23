@@ -6,7 +6,8 @@ Releases are created by `.github/workflows/release.yml` when a matching Git tag 
 
 - Mod metadata: `SemVer`, for example `0.1.0`
 - Git tag and GitHub Release: `MinecraftVersion-SemVer`, for example `1.20.1-0.1.0`
-- Public JAR and Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.20.1-0.1.0.jar`
+- Public JAR: `ResourceReloadGuard-Loader-MinecraftVersion-SemVer.jar`, for example `ResourceReloadGuard-Fabric-1.20.1-0.1.0.jar`
+- Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.20.1-0.1.0`
 
 The workflow verifies that the tag matches `minecraft_version` and `mod_version` in `gradle.properties`. It also requires a matching section in `CHANGELOG.md`.
 

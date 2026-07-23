@@ -19,8 +19,8 @@ subprojects {
     apply plugin: 'maven-publish'
 
     base {
-        // Public artifacts use Loader-MinecraftVersion-SemVer.jar.
-        archivesName = "${project.name.capitalize()}-$rootProject.minecraft_version"
+        // Public artifacts use ModName-Loader-MinecraftVersion-SemVer.jar.
+        archivesName = "$rootProject.archives_name-${project.name.capitalize()}-$rootProject.minecraft_version"
     }
 
     repositories {

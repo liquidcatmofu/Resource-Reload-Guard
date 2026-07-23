@@ -72,8 +72,8 @@ jobs:
           set -euo pipefail
           mkdir -p dist
 
-          fabric_jar="fabric/build/libs/Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
-          forge_jar="forge/build/libs/Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          fabric_jar="fabric/build/libs/ResourceReloadGuard-Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
+          forge_jar="forge/build/libs/ResourceReloadGuard-Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar"
           test -f "$fabric_jar"
           test -f "$forge_jar"
           cp "$fabric_jar" dist/
@@ -89,10 +89,10 @@ jobs:
             exit 1
           fi
 
-          unzip -p "dist/Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" fabric.mod.json \
+          unzip -p "dist/ResourceReloadGuard-Fabric-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" fabric.mod.json \
             | jq -e --arg version "$MOD_VERSION" --arg minecraft "~$MINECRAFT_VERSION" \
               '.version == $version and .environment == "client" and .depends.minecraft == $minecraft' > /dev/null
-          unzip -p "dist/Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" META-INF/mods.toml \
+          unzip -p "dist/ResourceReloadGuard-Forge-${MINECRAFT_VERSION}-${MOD_VERSION}.jar" META-INF/mods.toml \
             | grep -Fq "version = \"$MOD_VERSION\""
 
           sha256sum dist/*.jar
@@ -200,7 +200,7 @@ jobs:
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: dist/${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          files: dist/ResourceReloadGuard-${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
           name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version-type: release
@@ -242,7 +242,7 @@ jobs:
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files: dist/${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
+          files: dist/ResourceReloadGuard-${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
           name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version-type: release
