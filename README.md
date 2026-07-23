@@ -6,17 +6,17 @@
 
 [日本語](README_ja.md) · [Changelog](CHANGELOG.md)
 
-Resource Reload Guard is a client-side mod for Minecraft Java Edition 1.20.1.
+Resource Reload Guard is a client-side mod for Minecraft Java Edition 1.21.1.
 
 Reloading client resources can take several minutes in large modpacks and may cause long garbage-collection pauses, hangs, or crashes. This mod does not make resource loading faster. Instead, it guards known user actions so an expensive reload does not begin accidentally or unnecessarily.
 
 ## Supported environments
 
-- Minecraft 1.20.1
-- Forge 47.x
+- Minecraft 1.21.1
+- NeoForge 21.1.x
 - Fabric Loader (Fabric API required)
 
-Forge and Fabric use separate JARs. Install the JAR for your loader in the client `mods` directory. The Fabric build also requires Fabric API.
+NeoForge and Fabric use separate JARs. Install the JAR for your loader in the client `mods` directory. The Fabric build also requires Fabric API.
 
 ## Features
 
@@ -81,7 +81,7 @@ Available policy values are `ALLOW`, `CONFIRM`, `BLOCK`, and `RESTART_ONLY`. The
 
 ## Building
 
-Use JDK 21 and run from the repository root. The resulting mod still targets Java 17:
+Use JDK 21 and run from the repository root. Minecraft 1.21.1 and the resulting mod target Java 21:
 
 ```bash
 ./gradlew clean build
@@ -93,7 +93,7 @@ On Windows:
 .\gradlew.bat clean build
 ```
 
-Artifacts are generated in `forge/build/libs` and `fabric/build/libs`.
+Artifacts are generated in `neoforge/build/libs` and `fabric/build/libs`.
 
 The Fabric `runClient` configuration includes Mod Menu and the full Fabric API as development-only runtime dependencies. They are used to inspect the mod metadata and icon, and are not bundled into the release JAR.
 

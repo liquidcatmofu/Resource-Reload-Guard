@@ -5,9 +5,9 @@ Releases are created by `.github/workflows/release.yml` when a matching Git tag 
 ## Version scheme
 
 - Mod metadata: `SemVer`, for example `0.1.0`
-- Git tag and GitHub Release: `MinecraftVersion-SemVer`, for example `1.20.1-0.1.0`
-- Public JAR: `ResourceReloadGuard-Loader-MinecraftVersion-SemVer.jar`, for example `ResourceReloadGuard-Fabric-1.20.1-0.1.0.jar`
-- Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.20.1-0.1.0`
+- Git tag and GitHub Release: `MinecraftVersion-SemVer`, for example `1.21.1-0.1.1`
+- Public JAR: `ResourceReloadGuard-Loader-MinecraftVersion-SemVer.jar`, for example `ResourceReloadGuard-Fabric-1.21.1-0.1.1.jar`
+- Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.21.1-0.1.1`
 
 The workflow verifies that the tag matches `minecraft_version` and `mod_version` in `gradle.properties`. It also requires a matching section in `CHANGELOG.md`.
 
@@ -24,7 +24,7 @@ The release channel is derived from `mod_version`, so there is no separate chann
 
 GitHub does not distinguish Alpha from Beta, so the SemVer suffix carries that distinction. Unknown prerelease labels are rejected. Pre-releases are explicitly excluded from `Latest`.
 
-The same SemVer, including its prerelease suffix, is expanded into the Fabric and Forge metadata inside each JAR. Minecraft compatibility remains separate metadata.
+The same SemVer, including its prerelease suffix, is expanded into the Fabric and NeoForge metadata inside each JAR. Minecraft compatibility remains separate metadata.
 
 ## Version source and increments
 
@@ -50,13 +50,13 @@ The built-in `GITHUB_TOKEN` publishes the GitHub Release and needs no additional
 
 ## Platform metadata
 
-Resource Reload Guard is a client-only mod.
+Resource Reload Guard is a client-only mod for Fabric and NeoForge.
 
 - Modrinth project type: `mod`
 - Modrinth version environment: client only
 - CurseForge file environment: client only
 
-Modrinth environment metadata belongs to each uploaded version rather than the project as a whole. The release workflow runs Gradle on JDK 21, while the compiled mod and published compatibility metadata continue to target Java 17. Every Modrinth and CurseForge upload explicitly declares one loader, one Minecraft version, Java 17, and the client-only environment. The Fabric upload declares Fabric API as a required dependency.
+Modrinth environment metadata belongs to each uploaded version rather than the project as a whole. The release workflow, compiled mod, and published compatibility metadata use the Java version declared in `gradle.properties` (Java 21 for Minecraft 1.21.1). Every Modrinth and CurseForge upload explicitly declares one loader, one Minecraft version, the target Java version, and the client-only environment. The Fabric upload declares Fabric API as a required dependency.
 
 ## Release procedure
 
@@ -66,8 +66,8 @@ Modrinth environment metadata belongs to each uploaded version rather than the p
 4. Create and push the exact release tag, for example:
 
    ```bash
-   git tag 1.20.1-0.1.0
-   git push origin 1.20.1-0.1.0
+   git tag 1.21.1-0.1.1
+   git push origin 1.21.1-0.1.1
    ```
 
 The workflow builds once, attaches both loader JARs to one GitHub Release, and creates a separate one-file version for each loader on Modrinth and CurseForge.
