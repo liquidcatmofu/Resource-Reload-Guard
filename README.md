@@ -4,19 +4,24 @@
 
 # Resource Reload Guard
 
+[![CurseForge Downloads](https://img.shields.io/curseforge/dt/1620887?style=flat-square&logo=curseforge&logoColor=white&label=CurseForge)](https://www.curseforge.com/minecraft/mc-mods/resource-reload-guard)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/resource-reload-guard?style=flat-square&logo=modrinth&logoColor=white&label=Modrinth)](https://modrinth.com/mod/resource-reload-guard)
+
 [日本語](README_ja.md) · [Changelog](CHANGELOG.md)
 
-Resource Reload Guard is a client-side mod for Minecraft Java Edition 1.20.1.
+Resource Reload Guard is a client-side mod for Minecraft Java Edition.
 
 Reloading client resources can take several minutes in large modpacks and may cause long garbage-collection pauses, hangs, or crashes. This mod does not make resource loading faster. Instead, it guards known user actions so an expensive reload does not begin accidentally or unnecessarily.
 
 ## Supported environments
 
-- Minecraft 1.20.1
-- Forge 47.x
-- Fabric Loader (Fabric API required)
+Resource Reload Guard is client-side only and is available for:
 
-Forge and Fabric use separate JARs. Install the JAR for your loader in the client `mods` directory. The Fabric build also requires Fabric API.
+- Fabric (Fabric API required)
+- Forge
+- NeoForge
+
+Download the JAR matching your Minecraft version and loader from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/resource-reload-guard) or [Modrinth](https://modrinth.com/mod/resource-reload-guard), then place it in the client `mods` directory. Available Minecraft-version and loader combinations vary by release.
 
 ## Features
 
@@ -81,7 +86,7 @@ Available policy values are `ALLOW`, `CONFIRM`, `BLOCK`, and `RESTART_ONLY`. The
 
 ## Building
 
-Use JDK 21 and run from the repository root. The resulting mod still targets Java 17:
+Use a JDK compatible with the target Minecraft version and run from the repository root:
 
 ```bash
 ./gradlew clean build
@@ -93,7 +98,7 @@ On Windows:
 .\gradlew.bat clean build
 ```
 
-Artifacts are generated in `forge/build/libs` and `fabric/build/libs`.
+Artifacts are generated in each enabled loader's `build/libs` directory.
 
 The Fabric `runClient` configuration includes Mod Menu and the full Fabric API as development-only runtime dependencies. They are used to inspect the mod metadata and icon, and are not bundled into the release JAR.
 

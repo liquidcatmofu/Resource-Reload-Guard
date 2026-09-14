@@ -4,19 +4,24 @@
 
 # Resource Reload Guard
 
+[![CurseForge Downloads](https://img.shields.io/curseforge/dt/1620887?style=flat-square&logo=curseforge&logoColor=white&label=CurseForge)](https://www.curseforge.com/minecraft/mc-mods/resource-reload-guard)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/resource-reload-guard?style=flat-square&logo=modrinth&logoColor=white&label=Modrinth)](https://modrinth.com/mod/resource-reload-guard)
+
 [English](README.md) · [変更履歴](CHANGELOG.md)
 
-Resource Reload Guardは、Minecraft Java Edition 1.20.1向けのクライアント専用MODです。
+Resource Reload Guardは、Minecraft Java Edition 向けのクライアント専用MODです。
 
 大規模なMOD環境では、クライアントリソースの再読み込みに数分以上かかったり、長時間のGC、停止、クラッシュが発生したりする場合があります。このMODはリロード処理そのものを高速化せず、ユーザー操作による不要・不意のリロードを開始前に制御します。
 
 ## 対応環境
 
-- Minecraft 1.20.1
-- Forge 47.x
-- Fabric Loader（Fabric APIが必要）
+Resource Reload Guardはクライアント専用で、次のMod Loaderに対応しています。
 
-Forge版とFabric版は別々のJARです。使用するLoaderに対応するJARをクライアントの `mods` ディレクトリへ配置してください。Fabric版ではFabric APIも導入してください。
+- Fabric（Fabric APIが必要）
+- Forge
+- NeoForge
+
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/resource-reload-guard)または[Modrinth](https://modrinth.com/mod/resource-reload-guard)から、MinecraftのバージョンとMod Loaderに合うJARをダウンロードし、クライアントの `mods` ディレクトリへ配置してください。利用できるMinecraftバージョンとMod Loaderの組み合わせはリリースごとに異なります。
 
 ## 機能
 
@@ -81,7 +86,7 @@ config/resource_reload_guard.toml
 
 ## ビルド
 
-JDK 21を用意し、リポジトリのルートで実行します。生成されるMODは引き続きJava 17を対象とします。
+対象のMinecraftバージョンに対応するJDKを用意し、リポジトリのルートで実行します。
 
 ```bash
 ./gradlew clean build
@@ -93,7 +98,7 @@ Windowsでは次のコマンドを使用します。
 .\gradlew.bat clean build
 ```
 
-成果物は `forge/build/libs` と `fabric/build/libs` に生成されます。
+成果物は、有効な各Mod Loaderの `build/libs` ディレクトリに生成されます。
 
 Fabricの `runClient` には、開発時のランタイム依存としてMod Menuと完全版Fabric APIが追加されます。MODメタデータとアイコンの確認用であり、配布JARには同梱されません。
 
