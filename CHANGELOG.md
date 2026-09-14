@@ -6,6 +6,8 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-15
+
 ### Fixed
 
 - Corrected the confirmation-screen render order on Minecraft 1.21.1 so its text remains visible and the in-game background is not darkened twice.

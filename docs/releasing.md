@@ -5,9 +5,9 @@ Releases are created by `.github/workflows/release.yml` when a matching Git tag 
 ## Version scheme
 
 - Mod metadata: `SemVer`, for example `0.1.0`
-- Git tag and GitHub Release: `MinecraftVersion-SemVer`, for example `1.21.1-0.1.1`
-- Public JAR: `ResourceReloadGuard-Loader-MinecraftVersion-SemVer.jar`, for example `ResourceReloadGuard-Fabric-1.21.1-0.1.1.jar`
-- Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.21.1-0.1.1`
+- Git tag and GitHub Release: `MinecraftVersion-SemVer`, for example `1.21.1-0.1.2`
+- Public JAR: `ResourceReloadGuard-Loader-MinecraftVersion-SemVer.jar`, for example `ResourceReloadGuard-Fabric-1.21.1-0.1.2.jar`
+- Modrinth/CurseForge version: `Loader-MinecraftVersion-SemVer`, for example `Fabric-1.21.1-0.1.2`
 
 The workflow verifies that the tag matches `minecraft_version` and `mod_version` in `gradle.properties`. It also requires a matching section in `CHANGELOG.md`.
 
@@ -66,8 +66,8 @@ Modrinth environment metadata belongs to each uploaded version rather than the p
 4. Create and push the exact release tag, for example:
 
    ```bash
-   git tag 1.21.1-0.1.1
-   git push origin 1.21.1-0.1.1
+   git tag 1.21.1-0.1.2
+   git push origin 1.21.1-0.1.2
    ```
 
 The workflow builds once, attaches both loader JARs to one GitHub Release, and creates a separate one-file version for each loader on Modrinth and CurseForge.
