@@ -236,7 +236,6 @@ jobs:
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-unfeature-mode: none
           files: dist/ResourceReloadGuard-${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}.jar
           name: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
           version: ${{ matrix.label }}-${{ needs.build.outputs.minecraft_version }}-${{ needs.build.outputs.mod_version }}
